@@ -1,26 +1,22 @@
-# prod
-dist/
-
-# dev
-.yarn/
-!.yarn/releases
-.vscode/*
-!.vscode/launch.json
-!.vscode/*.code-snippets
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/shelf
-
-# deps
+# Dependencies
 node_modules/
-.wrangler
+.pnp
+.pnp.js
 
-# env
+# Production & Build outputs
+dist/
+build/
+.vercel
+.wrangler/
+.mf/
+
+# Environment variables
 .env
-.env.production
+.env.*
+!.env.example
 .dev.vars
 
-# logs
+# Logs
 logs/
 *.log
 npm-debug.log*
@@ -29,5 +25,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# misc
+# Editor & OS files
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/launch.json
+!.vscode/*.code-snippets
+*.sublime-workspace
+*.sublime-project
+
+# Temporary / Scratch files
+tmp/
+temp/
+scratch/
