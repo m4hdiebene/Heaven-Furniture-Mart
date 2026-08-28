@@ -36,11 +36,14 @@ export const renderer = jsxRenderer(({ children }) => {
           }
         />
 
-        {/* Fonts: elegant serif for headlines, clean sans for body */}
+        {/* Fonts — Fraunces: a high-contrast variable serif with optical-size
+            and SOFT/WONK axes, so display cuts get proper editorial drawing
+            instead of a flat single-weight webfont. Instrument Sans carries
+            body, buttons and contact details. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
           rel="stylesheet"
         />
 

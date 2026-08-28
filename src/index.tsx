@@ -72,6 +72,9 @@ const TRUST = [
   }
 ]
 
+/* Collections are laid out so every grid row is completely full:
+   row 1 → 7 + 5 cols, row 2 → 4 + 4 + 4, row 3 → one 12-col panorama.
+   No card is ever left orphaned on a row of its own. */
 const COLLECTIONS = [
   {
     img: '/static/img/living-sofa.webp',
@@ -86,7 +89,7 @@ const COLLECTIONS = [
     kicker: 'Collection 02',
     t: 'Bedroom',
     d: 'Beds, wardrobes, dressing tables and bedside pieces — quiet luxury where the day ends.',
-    cls: '',
+    cls: 'coll--tall',
     alt: 'Emerald green velvet upholstered king bed with quilted footboard in a warmly lit bedroom'
   },
   {
@@ -106,21 +109,29 @@ const COLLECTIONS = [
     alt: 'Dark walnut executive desk with tufted leather chair and a tall bookshelf in a luxury home office'
   },
   {
-    img: '/static/img/dining-blush.webp',
-    kicker: 'Collection 05',
-    t: 'Statement Pieces',
-    d: 'The one-off designs our clients ask us to make again and again — then ask us to make differently.',
-    cls: '',
-    alt: 'Marble dining table with blush pink quilted velvet chairs under a chandelier'
-  },
-  {
     img: '/static/img/bedroom-classic.webp',
-    kicker: 'Collection 06',
+    kicker: 'Collection 05',
     t: 'Classic Woodwork',
     d: 'Traditional silhouettes in deep polished timber, carved by hand in our own workshop.',
     cls: '',
     alt: 'Classic dark wood bed with tall carved wardrobe and warm bedside lamp'
+  },
+  {
+    img: '/static/img/closer.webp',
+    kicker: 'Collection 06 · Bespoke',
+    t: 'Statement & one-off pieces',
+    d: 'Consoles, mirrors, occasional chairs — the one-off designs our clients ask us to make again and again, then ask us to make differently. Bring a reference or a rough sketch and we will draw it properly.',
+    cls: 'coll--pano',
+    alt: 'Wide view of a hand-carved marble-topped console table with a gilt mirror and two cream upholstered armchairs in a luxury interior'
   }
+]
+
+/* Proof points used in the intro stat band — brief facts, not invented numbers */
+const STATS = [
+  { n: '2020', l: 'Founded in Chattogram' },
+  { n: 'Agrabad', l: 'Flagship showroom' },
+  { n: 'In-house', l: 'Design & craftsmanship' },
+  { n: 'Hundreds', l: 'Of happy homeowners' }
 ]
 
 const STEPS = [
@@ -256,38 +267,75 @@ app.get('/', (c) => {
 
       {/* ============ INTRO ============ */}
       <section class="section" id="intro">
-        <div class="wrap intro-grid">
-          <div class="reveal">
-            <p class="eyebrow">Who we are</p>
-            <p class="intro-signature" style="margin-top:1.5rem">
-              One of Chattogram's leading bespoke furniture houses.
-            </p>
-            <div class="intro-tagline" aria-label={BRAND.tagline}>
-              <span>Designed.</span>
-              <i></i>
-              <span>Crafted.</span>
-              <i></i>
-              <span>Customized.</span>
+        <div class="wrap">
+          <div class="intro-grid">
+            <div class="intro-lead reveal">
+              <p class="eyebrow">Who we are</p>
+              <p class="intro-signature">
+                One of Chattogram's leading bespoke furniture houses.
+              </p>
+              <div class="intro-tagline" aria-label={BRAND.tagline}>
+                <span>Designed.</span>
+                <i></i>
+                <span>Crafted.</span>
+                <i></i>
+                <span>Customized.</span>
+              </div>
+              <ul class="intro-list">
+                <li>Living room — sofa sets, tables, consoles</li>
+                <li>Bedroom — beds, wardrobes, dressing units</li>
+                <li>Dining — tables, chairs, cabinets</li>
+                <li>Office &amp; study — desks, shelving</li>
+                <li>Bespoke — anything drawn to your room</li>
+              </ul>
+              <div class="intro-founder">
+                <span class="meta">Founded by</span>
+                <span class="who">{BRAND.md}</span>
+                <span class="meta">Managing Director</span>
+              </div>
             </div>
-          </div>
 
-          <div class="reveal" data-d="1">
-            <p class="lede">
-              We design and craft custom furniture — sofas, beds, dining sets, office pieces — built around what you
-              actually want, not what happened to be in stock. Every commission starts with a conversation and a
-              measurement, and ends with a piece that belongs in your room.
-            </p>
-            <p class="lede" style="margin-top:1.5rem">
-              Walk into our Agrabad showroom and you'll find an interior studio rather than a shop floor: real
-              materials, real craftsmanship, and designers who would rather understand your home than sell you a
-              catalogue number.
-            </p>
-            <div style="margin-top:2.25rem">
+            <div class="intro-copy reveal" data-d="1">
+              <p class="lede">
+                We design and craft custom furniture — sofas, beds, dining sets, office pieces — built around what you
+                actually want, not what happened to be in stock. Every commission starts with a conversation and a
+                measurement, and ends with a piece that belongs in your room.
+              </p>
+              <p class="lede">
+                Walk into our Agrabad showroom and you'll find an interior studio rather than a shop floor: real
+                materials, real craftsmanship, and designers who would rather understand your home than sell you a
+                catalogue number.
+              </p>
+              <p class="lede">
+                Premium seasoned hardwood, considered fabrics, brass hardware chosen to age well — joined by our own
+                artisans, then delivered and installed by our own team.
+              </p>
               <a class="tlink" href="#bespoke">
                 <span>How a bespoke commission works</span>
                 <IconArrow />
               </a>
             </div>
+
+            <figure class="intro-media reveal" data-d="2">
+              <img
+                src="/static/img/detail.webp"
+                alt="Close-up of a hand-carved walnut chair arm with floral relief detail meeting cream linen upholstery, with timber veneer samples behind"
+                loading="lazy"
+                decoding="async"
+                width="900"
+                height="1200"
+              />
+              <figcaption>Hand-carved detail · our workshop</figcaption>
+            </figure>
+          </div>
+
+          <div class="stat-band reveal" data-d="1">
+            {STATS.map((s) => (
+              <div class="sb">
+                <span class="n">{s.n}</span>
+                <span class="l">{s.l}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -295,23 +343,36 @@ app.get('/', (c) => {
       {/* ============ COLLECTIONS ============ */}
       <section class="section section--tint" id="collections">
         <div class="wrap">
-          <div class="why-head">
+          <div class="sec-head">
             <div class="reveal">
               <p class="eyebrow">Collections</p>
-              <h2 class="display d-lg" style="margin-top:1.35rem">
+              <h2 class="display d-lg">
                 Rooms we make <em>unforgettable</em>
               </h2>
             </div>
-            <p class="lede reveal" data-d="1">
-              A glimpse of what leaves our workshop. Every piece shown can be rebuilt in your dimensions, your timber
-              and your fabric.
-            </p>
+            <div class="sec-head-aside reveal" data-d="1">
+              <p class="lede">
+                A glimpse of what leaves our workshop. Every piece shown can be rebuilt in your dimensions, your timber
+                and your fabric.
+              </p>
+              <a class="tlink" href="#visit">
+                <span>Enquire about any piece</span>
+                <IconArrow />
+              </a>
+            </div>
           </div>
 
           <div class="coll-grid">
             {COLLECTIONS.map((k, i) => (
               <a class={`coll reveal ${k.cls}`} data-d={String(Math.min(i, 3))} href="#visit">
-                <img src={k.img} alt={k.alt} loading="lazy" decoding="async" width="900" height="900" />
+                <img
+                  src={k.img}
+                  alt={k.alt}
+                  loading="lazy"
+                  decoding="async"
+                  width={k.cls === 'coll--pano' ? 2200 : 900}
+                  height={k.cls === 'coll--pano' ? 933 : 900}
+                />
                 <div class="coll-body">
                   <span class="coll-kicker">{k.kicker}</span>
                   <h3>{k.t}</h3>
@@ -327,21 +388,25 @@ app.get('/', (c) => {
         </div>
       </section>
 
-      {/* ============ BESPOKE MOMENT ============ */}
-      <section class="section bespoke" id="bespoke">
-        <div class="wrap bespoke-grid">
+      {/* ============ BESPOKE MOMENT ============
+          Image bleeds edge-to-edge at full column height and the four
+          process steps run as a 2x2 matrix, so the section reads dense
+          and deliberate rather than a thin list floating in dark space. */}
+      <section class="bespoke" id="bespoke">
+        <div class="bespoke-grid">
           <div class="bespoke-media reveal">
+            <span class="frame" aria-hidden="true"></span>
             <img
-              src="/static/img/craft.webp"
+              src="/static/img/craft-tall.webp"
               alt="Close-up of a craftsman's hands carving detail into a dark walnut furniture edge with a chisel"
               loading="lazy"
               decoding="async"
-              width="1600"
-              height="1073"
+              width="1000"
+              height="1250"
             />
           </div>
 
-          <div class="reveal" data-d="1">
+          <div class="bespoke-body reveal" data-d="1">
             <p class="eyebrow">The bespoke difference</p>
             <h2 class="display d-lg">
               Built for your room, <em>not a warehouse</em>
@@ -361,7 +426,7 @@ app.get('/', (c) => {
                 </div>
               ))}
             </div>
-            <div style="margin-top:2.5rem;display:flex;flex-wrap:wrap;gap:0.85rem">
+            <div class="btn-row">
               <a class="btn" href="#visit">
                 <span>Start your commission</span>
               </a>
@@ -377,16 +442,19 @@ app.get('/', (c) => {
       {/* ============ WHY HEAVEN ============ */}
       <section class="section" id="why">
         <div class="wrap">
-          <div class="why-head">
+          <div class="sec-head">
             <div class="reveal">
               <p class="eyebrow">Why homeowners choose Heaven</p>
-              <h2 class="display d-lg" style="margin-top:1.35rem">
+              <h2 class="display d-lg">
                 Six reasons this <em>feels different</em>
               </h2>
             </div>
-            <p class="lede reveal" data-d="1">
-              From first sketch to final installation, the whole thing is handled under one roof — ours.
-            </p>
+            <div class="sec-head-aside reveal" data-d="1">
+              <p class="lede">
+                From first sketch to final installation, the whole thing is handled under one roof — ours. No
+                subcontractors, no guesswork, no waiting on someone else's timeline.
+              </p>
+            </div>
           </div>
 
           <div class="trust-grid">
@@ -404,19 +472,21 @@ app.get('/', (c) => {
       {/* ============ PROOF / STORY ============ */}
       <section class="section section--tint" id="story">
         <div class="wrap">
+          {/* Showroom image, MD quote and the milestone timeline share one
+              row on wide screens so no column is left running short. */}
           <div class="quote-grid">
             <div class="quote-media reveal">
               <img
-                src="/static/img/showroom.webp"
-                alt="Wide view of the Heaven Furniture Mart showroom floor in Agrabad with styled living and dining sets"
+                src="/static/img/showroom-tall.webp"
+                alt="View of the Heaven Furniture Mart showroom floor in Agrabad with styled living and dining sets"
                 loading="lazy"
                 decoding="async"
-                width="1600"
-                height="1073"
+                width="920"
+                height="1150"
               />
             </div>
 
-            <div class="reveal" data-d="1">
+            <div class="quote-body reveal" data-d="1">
               <p class="eyebrow">From the Managing Director</p>
               <span class="quote-mark" aria-hidden="true">
                 &ldquo;
@@ -434,18 +504,18 @@ app.get('/', (c) => {
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="reveal" data-d="1" style="margin-top:clamp(3rem,8vh,5rem)">
-            <p class="eyebrow">Our journey</p>
-          </div>
-          <div class="timeline">
-            {MILESTONES.map((m, i) => (
-              <div class="ms reveal" data-d={String(Math.min(i, 4))}>
-                <span class="ms-year">{m.y}</span>
-                <span class="ms-text">{m.t}</span>
+            <div class="timeline-block reveal" data-d="2">
+              <p class="eyebrow">Our journey</p>
+              <div class="timeline">
+                {MILESTONES.map((m, i) => (
+                  <div class="ms">
+                    <span class="ms-year">{m.y}</span>
+                    <span class="ms-text">{m.t}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
