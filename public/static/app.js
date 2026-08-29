@@ -9,15 +9,36 @@
   /* ---------- Sticky nav ---------- */
   var nav = $('#site-nav');
   var fab = $('#fab');
+  var footer = $('.footer');
   var lastY = -1;
+
+  /* The footer lists the phone number, email, map link and its own WhatsApp
+     icon, so the floating pill has nothing left to offer there — and it was
+     sitting directly on top of the "Designed. Crafted. Customized." line.
+     Retire it as soon as the footer comes into view. */
+  var footerVisible = false;
+  if (footer && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      function (entries) {
+        footerVisible = entries[0].isIntersecting;
+        applyFab();
+      },
+      { rootMargin: '0px 0px -40px 0px' }
+    ).observe(footer);
+  }
+
+  function applyFab() {
+    if (!fab) return;
+    var pastHero = (window.pageYOffset || document.documentElement.scrollTop) > window.innerHeight * 0.7;
+    fab.classList.toggle('is-visible', pastHero && !footerVisible);
+  }
 
   function onScroll() {
     var y = window.pageYOffset || document.documentElement.scrollTop;
     if (y === lastY) return;
     lastY = y;
     if (nav) nav.classList.toggle('is-stuck', y > 40);
-    // Surface the WhatsApp CTA once the visitor is past the hero.
-    if (fab) fab.classList.toggle('is-visible', y > window.innerHeight * 0.7);
+    applyFab();
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -46,6 +67,40 @@
     });
   }
 
+  /* ---------- Scroll spy ----------
+     Marks the nav link for whichever section owns the upper third of the
+     viewport, so a visitor always knows where they are in the page. */
+  var spyLinks = $$('.nav-links a[href^="#"]');
+  if (spyLinks.length && 'IntersectionObserver' in window) {
+    var byId = {};
+    spyLinks.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    var targets = Object.keys(byId)
+      .map(function (id) { return document.getElementById(id); })
+      .filter(Boolean);
+
+    var visible = {};
+    var spyIO = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (en) {
+          visible[en.target.id] = en.isIntersecting ? en.intersectionRatio : 0;
+        });
+        // Pick the most-visible tracked section.
+        var best = null, bestVal = 0;
+        Object.keys(visible).forEach(function (id) {
+          if (visible[id] > bestVal) { bestVal = visible[id]; best = id; }
+        });
+        spyLinks.forEach(function (a) {
+          var on = best && a.getAttribute('href') === '#' + best;
+          a.classList.toggle('is-current', !!on);
+          if (on) a.setAttribute('aria-current', 'true');
+          else a.removeAttribute('aria-current');
+        });
+      },
+      { rootMargin: '-15% 0px -55% 0px', threshold: [0, 0.15, 0.4, 0.75, 1] }
+    );
+    targets.forEach(function (t) { spyIO.observe(t); });
+  }
+
   /* ---------- Scroll reveal ---------- */
   var reveals = $$('.reveal');
   if ('IntersectionObserver' in window && reveals.length) {
@@ -72,23 +127,38 @@
     var input = form.querySelector('[name="' + name + '"]');
     return input ? input.closest('.field') : null;
   }
+  var status = $('#form-status');
+
   function clearErrors() {
     $$('.field.has-error', form).forEach(function (f) { f.classList.remove('has-error'); });
     $$('.err', form).forEach(function (e) { e.textContent = ''; });
+    $$('[aria-invalid]', form).forEach(function (i) { i.removeAttribute('aria-invalid'); });
+    if (status) status.textContent = '';
   }
   function showErrors(errors) {
     var first = null;
-    Object.keys(errors).forEach(function (k) {
+    var keys = Object.keys(errors);
+    keys.forEach(function (k) {
       var f = fieldOf(k);
       if (!f) return;
       f.classList.add('has-error');
       var slot = f.querySelector('.err');
       if (slot) slot.textContent = errors[k];
+      var input = f.querySelector('input, select, textarea');
+      if (input) input.setAttribute('aria-invalid', 'true');
       if (!first) first = f;
     });
+    // Announce the failure — the red text alone tells a screen reader nothing.
+    if (status) {
+      status.textContent =
+        keys.length === 1
+          ? 'There is a problem: ' + errors[keys[0]]
+          : 'There are ' + keys.length + ' problems with your details. ' +
+            keys.map(function (k) { return errors[k]; }).join(' ');
+    }
     if (first) {
-      var input = first.querySelector('input, select, textarea');
-      if (input) input.focus({ preventScroll: false });
+      var focusEl = first.querySelector('input, select, textarea');
+      if (focusEl) focusEl.focus({ preventScroll: false });
     }
   }
 
@@ -99,6 +169,7 @@
       f.classList.remove('has-error');
       var slot = f.querySelector('.err');
       if (slot) slot.textContent = '';
+      if (e.target.removeAttribute) e.target.removeAttribute('aria-invalid');
     }
   });
 
@@ -124,7 +195,8 @@
       phone: (fd.get('phone') || '').toString(),
       email: (fd.get('email') || '').toString(),
       category: (fd.get('category') || '').toString(),
-      message: (fd.get('message') || '').toString()
+      message: (fd.get('message') || '').toString(),
+      website: (fd.get('website') || '').toString()
     };
 
     var local = localValidate(data);
@@ -149,6 +221,13 @@
               ' Our design team will call you within one working day to arrange your free consultation.';
           }
           panel.classList.add('is-sent');
+          // Move focus into the confirmation so it is announced and so the
+          // next Tab continues from the new content, not the removed form.
+          var heading = panel.querySelector('.form-success h3');
+          if (heading) {
+            heading.setAttribute('tabindex', '-1');
+            try { heading.focus({ preventScroll: true }); } catch (_) {}
+          }
           // Keep the confirmation in view on small screens.
           try { panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
         } else if (r.json && r.json.errors) {
