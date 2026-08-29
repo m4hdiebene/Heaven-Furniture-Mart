@@ -156,6 +156,11 @@ const CATS = ['Living Room', 'Bedroom', 'Dining', 'Office & Study', 'Bespoke / S
 app.get('/', (c) => {
   return c.render(
     <>
+      {/* Keyboard users shouldn't have to tab the whole nav to reach content. */}
+      <a class="skip" href="#top">
+        Skip to content
+      </a>
+
       {/* ============ NAV ============ */}
       <header class="nav" id="site-nav">
         <div class="nav-inner wrap">
@@ -178,6 +183,16 @@ app.get('/', (c) => {
               <span>Request a Quote</span>
             </a>
           </div>
+
+          {/* Mobile-only tap-to-call. The desktop bar carries the number and a
+              "Request a Quote" button, but on a phone the header was reduced to
+              a logo and a burger — no conversion action at all until the
+              floating WhatsApp pill appears well down the page. Most of this
+              audience converts on a call, so the number gets a permanent,
+              thumb-reachable icon in the bar itself. */}
+          <a class="nav-call" href={BRAND.phoneHref} aria-label={`Call Heaven Furniture Mart on ${BRAND.phoneDisplay}`}>
+            <IconPhone />
+          </a>
 
           <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
             <span></span>
@@ -590,8 +605,16 @@ app.get('/', (c) => {
                 <div class="frow">
                   <div class="field">
                     <label for="q-name">Your name</label>
-                    <input id="q-name" name="name" type="text" placeholder="e.g. Rahim Ahmed" autocomplete="name" required />
-                    <span class="err" data-err-for="name"></span>
+                    <input
+                      id="q-name"
+                      name="name"
+                      type="text"
+                      placeholder="e.g. Rahim Ahmed"
+                      autocomplete="name"
+                      aria-describedby="err-name"
+                      required
+                    />
+                    <span class="err" id="err-name" data-err-for="name"></span>
                   </div>
                   <div class="field">
                     <label for="q-phone">Phone / WhatsApp</label>
@@ -602,27 +625,35 @@ app.get('/', (c) => {
                       placeholder="01XXX-XXXXXX"
                       autocomplete="tel"
                       inputmode="tel"
+                      aria-describedby="err-phone"
                       required
                     />
-                    <span class="err" data-err-for="phone"></span>
+                    <span class="err" id="err-phone" data-err-for="phone"></span>
                   </div>
                 </div>
 
                 <div class="frow">
                   <div class="field">
                     <label for="q-cat">What are you furnishing?</label>
-                    <select id="q-cat" name="category" required>
+                    <select id="q-cat" name="category" aria-describedby="err-category" required>
                       <option value="">Select a category</option>
                       {CATS.map((x) => (
                         <option value={x}>{x}</option>
                       ))}
                     </select>
-                    <span class="err" data-err-for="category"></span>
+                    <span class="err" id="err-category" data-err-for="category"></span>
                   </div>
                   <div class="field">
                     <label for="q-email">Email (optional)</label>
-                    <input id="q-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
-                    <span class="err" data-err-for="email"></span>
+                    <input
+                      id="q-email"
+                      name="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      autocomplete="email"
+                      aria-describedby="err-email"
+                    />
+                    <span class="err" id="err-email" data-err-for="email"></span>
                   </div>
                 </div>
 
@@ -633,9 +664,22 @@ app.get('/', (c) => {
                     name="message"
                     rows={2}
                     placeholder="Room size, style you like, timeline, budget range…"
+                    aria-describedby="err-message"
                   ></textarea>
-                  <span class="err" data-err-for="message"></span>
+                  <span class="err" id="err-message" data-err-for="message"></span>
                 </div>
+              </div>
+
+              {/* Validation failures were only ever shown visually. This live
+                  region speaks the same summary, so a screen-reader user knows
+                  the submit was rejected and why. */}
+              <p class="sr-only" id="form-status" role="alert" aria-live="assertive"></p>
+
+              {/* Honeypot: invisible to humans, irresistible to naive bots.
+                  A filled value means the submission is discarded server-side. */}
+              <div class="hp" aria-hidden="true">
+                <label for="q-website">Website</label>
+                <input id="q-website" name="website" type="text" tabindex={-1} autocomplete="off" />
               </div>
 
               <button class="btn btn--block" type="submit" id="quote-submit">

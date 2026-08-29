@@ -34,6 +34,14 @@ api.post('/quote', async (c) => {
     return c.json({ ok: false, error: 'Invalid request.' }, 400)
   }
 
+  // Honeypot: a real visitor never sees the "website" field, so anything in it
+  // came from a bot filling every input it found. Answer 200 with the normal
+  // shape — telling a scraper it was detected only invites a retry — but skip
+  // the database entirely.
+  if (clean(body.website, 200)) {
+    return c.json({ ok: true, stored: false, message: 'Thank you — we will be in touch shortly.' })
+  }
+
   const name = clean(body.name, 120)
   const phone = clean(body.phone, 40)
   const email = clean(body.email, 160)

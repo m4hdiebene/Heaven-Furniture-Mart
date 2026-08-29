@@ -36,15 +36,25 @@ export const renderer = jsxRenderer(({ children }) => {
           }
         />
 
-        {/* Fonts — Fraunces: a high-contrast variable serif with optical-size
-            and SOFT/WONK axes, so display cuts get proper editorial drawing
-            instead of a flat single-weight webfont. Instrument Sans carries
-            body, buttons and contact details. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+        {/* Fonts are self-hosted, axis-limited variable subsets (see style.css).
+            Preloading the two cuts that draw above-the-fold text — the display
+            serif and the body sans — means the hero renders in the real
+            typeface on first paint instead of swapping a beat later. The
+            italic cut is left to load on demand; it first appears below the
+            fold. No third-party font origin sits on the critical path. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
-          rel="stylesheet"
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href="/static/fonts/fraunces-roman.woff2"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href="/static/fonts/instrument-sans.woff2"
+          crossorigin="anonymous"
         />
 
         {/* Preload hero art so the first paint is the photography */}
